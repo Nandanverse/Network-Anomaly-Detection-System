@@ -1,9 +1,9 @@
-import yaml
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+
 import joblib
+import pandas as pd
+import yaml
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 with open("config.yaml") as f:
     config = yaml.safe_load(f)

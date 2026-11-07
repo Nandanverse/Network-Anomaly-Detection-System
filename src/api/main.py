@@ -1,11 +1,10 @@
-import yaml
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import joblib
+import numpy as np
+import yaml
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
-import joblib
 
 with open("config.yaml") as f:
     config = yaml.safe_load(f)
@@ -25,6 +24,7 @@ threshold = np.percentile(
 
 app = FastAPI(title="IDS Anomaly Detection API", version="1.0.0")
 
+
 class FlowInput(BaseModel):
     duration: float
     orig_bytes: float
@@ -39,16 +39,20 @@ class FlowInput(BaseModel):
     orig_port: str
     resp_port: str
 
+
 class FlowBatch(BaseModel):
-    flows: List[FlowInput]
+    flows: list[FlowInput]
+
 
 class Prediction(BaseModel):
     anomaly_score: float
     is_anomaly: int
     predicted_attack: str
 
+
 class PredictionResponse(BaseModel):
-    predictions: List[Prediction]
+    predictions: list[Prediction]
+
 
 def preprocess_flow(flow: FlowInput) -> np.ndarray:
     numerical = np.array([[
@@ -67,17 +71,19 @@ def preprocess_flow(flow: FlowInput) -> np.ndarray:
 
     return np.hstack([numerical_scaled, categorical])
 
+
 @app.get("/health")
 async def health():
     return {"status": "healthy", "model": "isolation_forest"}
+
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict(batch: FlowBatch):
     try:
         results = []
         for flow in batch.flows:
-            X = preprocess_flow(flow)
-            score = -model.score_samples(X)[0]
+            x = preprocess_flow(flow)
+            score = -model.score_samples(x)[0]
             is_anomaly = int(score > threshold)
             predicted = reverse_mapping.get(1, "Unknown") if is_anomaly else "Benign"
             results.append(Prediction(
@@ -87,7 +93,8 @@ async def predict(batch: FlowBatch):
             ))
         return PredictionResponse(predictions=results)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
 
 @app.get("/model/info")
 async def model_info():

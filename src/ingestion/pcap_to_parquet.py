@@ -1,6 +1,7 @@
-import yaml
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+import yaml
 
 with open("config.yaml") as f:
     config = yaml.safe_load(f)

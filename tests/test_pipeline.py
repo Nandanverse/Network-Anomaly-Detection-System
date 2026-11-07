@@ -1,8 +1,9 @@
-import pytest
-import pandas as pd
-import numpy as np
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
@@ -17,8 +18,8 @@ def test_config_loads():
 
 
 def test_feature_columns_match_config():
-    import yaml
     import joblib
+    import yaml
 
     with open("config.yaml") as f:
         config = yaml.safe_load(f)
@@ -30,7 +31,6 @@ def test_feature_columns_match_config():
     scaler = joblib.load(model_dir / "scaler.pkl")
     encoders = joblib.load(model_dir / "encoders.pkl")
 
-    numerical = config["features"]["numerical"]
     categorical = config["features"]["categorical"]
 
     assert hasattr(scaler, "mean_")
@@ -38,8 +38,8 @@ def test_feature_columns_match_config():
 
 
 def test_model_predicts():
-    import yaml
     import joblib
+    import yaml
 
     with open("config.yaml") as f:
         config = yaml.safe_load(f)
@@ -52,10 +52,10 @@ def test_model_predicts():
     scaler = joblib.load(model_dir / "scaler.pkl")
 
     n_features = len(config["features"]["numerical"]) + len(config["features"]["categorical"])
-    X_test = np.random.randn(10, n_features)
-    X_test[:, :len(config["features"]["numerical"])] = scaler.transform(X_test[:, :len(config["features"]["numerical"])])
+    x_test = np.random.randn(10, n_features)
+    x_test[:, :len(config["features"]["numerical"])] = scaler.transform(x_test[:, :len(config["features"]["numerical"])])
 
-    scores = -model.score_samples(X_test)
+    scores = -model.score_samples(x_test)
     assert scores.shape == (10,)
     assert np.all(np.isfinite(scores))
 

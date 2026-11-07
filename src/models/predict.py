@@ -1,8 +1,9 @@
-import yaml
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
 import joblib
+import numpy as np
+import pandas as pd
+import yaml
 
 with open("config.yaml") as f:
     config = yaml.safe_load(f)
@@ -30,10 +31,12 @@ df["is_anomaly"] = (scores > threshold).astype(int)
 attack_mapping = config["features"]["attack_mapping"]
 reverse_mapping = {v: k for k, v in attack_mapping.items()}
 
+
 def map_attack(row):
     if row["is_anomaly"] == 1 and "label_encoded" in df.columns:
         return reverse_mapping.get(row["label_encoded"], "Unknown")
     return "Benign"
+
 
 df["predicted_attack"] = df.apply(map_attack, axis=1)
 

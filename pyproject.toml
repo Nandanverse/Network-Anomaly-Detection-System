@@ -38,9 +38,11 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM", "T20"]
-ignore = ["S101", "E501"]
 exclude = [".venv", "data", "*.parquet", "*.pkl"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "N", "B", "T20"]
+ignore = ["S101", "E501", "T201"]
 
 [tool.ruff.format]
 quote-style = "double"

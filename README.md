@@ -53,22 +53,9 @@ make full
 
 ## Architecture
 
-```
-┌─────────────┐     ┌─────────────┐     ┌──────────────────┐
-│   PCAP      │────▶│   Zeek      │────▶│  flows.parquet   │
-│  (sample)   │     │  (Docker)   │     │  (features)      │
-└─────────────┘     └─────────────┘     └────────┬─────────┘
-                                                  │
-                    ┌─────────────┐     ┌────────▼─────────┐
-                    │  Streamlit  │◀────│  Isolation       │
-                    │  Dashboard  │     │  Forest Model    │
-                    └─────────────┘     └──────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │  Grafana    │
-                    │  Dashboard  │
-                    └─────────────┘
-```
+<p align="center">
+  <img src="docs/images/architecture.png" alt="System Architecture" width="800">
+</p>
 
 | Stage | Tool | Purpose |
 |-------|------|---------|
@@ -165,6 +152,27 @@ make ingest features train predict
 |-----------|-----|---------|
 | **Streamlit** | `http://localhost:8501` | Analyst view: alerts, timeline, attack breakdown, flow table, MITRE mapping |
 | **Grafana** | `http://localhost:3000` | Ops view: gauges, time-series, protocol dist, recent flows table (admin/admin) |
+
+#### Streamlit — Analyst View
+
+<p align="center">
+  <img src="docs/images/streamlit-timeline.png" alt="Streamlit Timeline" width="800">
+</p>
+
+<p align="center">
+  <img src="docs/images/streamlit-attack-breakdown.png" alt="Streamlit Attack Breakdown" width="600">
+  <img src="docs/images/streamlit-protocol-dist.png" alt="Streamlit Protocol Distribution" width="400">
+</p>
+
+<p align="center">
+  <img src="docs/images/streamlit-flow-table.png" alt="Streamlit Flow Table" width="900">
+</p>
+
+#### Grafana — Ops View
+
+<p align="center">
+  <img src="docs/images/grafana-dashboard.png" alt="Grafana Dashboard" width="1000">
+</p>
 
 ---
 

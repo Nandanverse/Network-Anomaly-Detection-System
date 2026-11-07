@@ -1,14 +1,18 @@
-import yaml
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from sklearn.ensemble import IsolationForest
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import (
-    roc_auc_score, precision_score, recall_score,
-    f1_score, average_precision_score
-)
+
 import joblib
+import numpy as np
+import pandas as pd
+import yaml
+from sklearn.ensemble import IsolationForest
+from sklearn.metrics import (
+    average_precision_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from sklearn.model_selection import train_test_split
 
 with open("config.yaml") as f:
     config = yaml.safe_load(f)
