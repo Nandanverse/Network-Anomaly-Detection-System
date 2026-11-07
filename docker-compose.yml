@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  zeek:
+    image: ghcr.io/zeek/zeek:latest
+    container_name: ids-zeek
+    volumes:
+      - ./data:/data
+      - ./src/ingestion/zeek_scripts:/zeek_scripts
+    working_dir: /data
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      tail -f /dev/null
+    networks:
+      - ids-network
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: ids-streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src
+      - ./dashboards/streamlit:/app/dashboards/streamlit
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - PYTHONPATH=/app
+      - CONFIG_PATH=/app/config.yaml
+    networks:
+      - ids-network
+    depends_on:
+      - zeek
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: ids-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./dashboards/grafana:/etc/grafana/provisioning/dashboards
+      - ./dashboards/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - ids-network
+
+  duckdb:
+    image: duckdb/duckdb:latest
+    container_name: ids-duckdb
+    volumes:
+      - ./data:/data
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      tail -f /dev/null
+    networks:
+      - ids-network
+
+networks:
+  ids-network:
+    driver: bridge
+
+volumes:
+  grafana-storage:

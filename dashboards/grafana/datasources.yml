@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+  - name: DuckDB
+    type: duckdb
+    access: proxy
+    url: http://duckdb:8080
+    jsonData:
+      path: /data/flows.parquet
+    editable: false

@@ -1,0 +1,83 @@
+paths:
+  data_dir: "data"
+  model_dir: "src/models"
+  zeek_scripts: "src/ingestion/zeek_scripts"
+  dashboards: "dashboards"
+
+ingestion:
+  pcap_file: "sample.pcap"
+  output_format: "parquet"
+  flow_timeout: 300
+
+features:
+  numerical:
+    - "duration"
+    - "orig_bytes"
+    - "resp_bytes"
+    - "orig_pkts"
+    - "resp_pkts"
+    - "orig_ip_bytes"
+    - "resp_ip_bytes"
+  categorical:
+    - "proto"
+    - "service"
+    - "conn_state"
+    - "id_orig_p"
+    - "id_resp_p"
+  temporal:
+    - "ts"
+  label_column: "label"
+  attack_mapping:
+    "Benign": 0
+    "DoS": 1
+    "DDoS": 2
+    "PortScan": 3
+    "BruteForce": 4
+    "WebAttack": 5
+    "Infiltration": 6
+    "Botnet": 7
+
+model:
+  type: "isolation_forest"
+  contamination: 0.2
+  n_estimators: 200
+  max_samples: "auto"
+  random_state: 42
+  n_jobs: -1
+  threshold_percentile: 80
+
+evaluation:
+  test_size: 0.2
+  stratify: true
+  metrics:
+    - "roc_auc"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "average_precision"
+
+dashboard:
+  streamlit_port: 8501
+  grafana_port: 3000
+  refresh_interval: 5
+  max_alerts: 100
+  attack_colors:
+    "Benign": "#2e7d32"
+    "DoS": "#c62828"
+    "DDoS": "#b71c1c"
+    "PortScan": "#ef6c00"
+    "BruteForce": "#d84315"
+    "WebAttack": "#ad1457"
+    "Infiltration": "#6a1b9a"
+    "Botnet": "#4a148c"
+
+mitre_attack:
+  techniques:
+    "T1046": "Network Service Scanning"
+    "T1499": "Endpoint Denial of Service"
+    "T1498": "Network Denial of Service"
+    "T1110": "Brute Force"
+    "T1190": "Exploit Public-Facing Application"
+    "T1059": "Command and Scripting Interpreter"
+    "T1071": "Application Layer Protocol"
+    "T1041": "Exfiltration Over Command and Control Channel"
