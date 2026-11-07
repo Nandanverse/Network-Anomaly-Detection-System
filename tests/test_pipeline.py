@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 def test_config_loads():
     import yaml
+
     with open("config.yaml") as f:
         config = yaml.safe_load(f)
     assert "paths" in config
@@ -53,7 +54,9 @@ def test_model_predicts():
 
     n_features = len(config["features"]["numerical"]) + len(config["features"]["categorical"])
     x_test = np.random.randn(10, n_features)
-    x_test[:, :len(config["features"]["numerical"])] = scaler.transform(x_test[:, :len(config["features"]["numerical"])])
+    x_test[:, : len(config["features"]["numerical"])] = scaler.transform(
+        x_test[:, : len(config["features"]["numerical"])]
+    )
 
     scores = -model.score_samples(x_test)
     assert scores.shape == (10,)

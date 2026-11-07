@@ -14,11 +14,27 @@ output_file = data_dir / "flows.parquet"
 if zeek_log.exists():
     df = pd.read_csv(zeek_log, sep="\t", comment="#", header=None)
     df.columns = [
-        "ts", "uid", "id_orig_h", "id_orig_p", "id_resp_h", "id_resp_p",
-        "proto", "service", "duration", "orig_bytes", "resp_bytes",
-        "conn_state", "local_orig", "local_resp", "missed_bytes",
-        "history", "orig_pkts", "orig_ip_bytes", "resp_pkts", "resp_ip_bytes",
-        "tunnel_parents"
+        "ts",
+        "uid",
+        "id_orig_h",
+        "id_orig_p",
+        "id_resp_h",
+        "id_resp_p",
+        "proto",
+        "service",
+        "duration",
+        "orig_bytes",
+        "resp_bytes",
+        "conn_state",
+        "local_orig",
+        "local_resp",
+        "missed_bytes",
+        "history",
+        "orig_pkts",
+        "orig_ip_bytes",
+        "resp_pkts",
+        "resp_ip_bytes",
+        "tunnel_parents",
     ]
     df["ts"] = pd.to_datetime(df["ts"], unit="s")
     df["duration"] = df["duration"].astype(float)

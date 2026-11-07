@@ -34,9 +34,11 @@ X = df[feature_cols].values
 y = df[label_col].values if label_col in df.columns else np.zeros(len(df))
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=config["evaluation"]["test_size"],
+    X,
+    y,
+    test_size=config["evaluation"]["test_size"],
     stratify=y if config["evaluation"]["stratify"] else None,
-    random_state=config["model"]["random_state"]
+    random_state=config["model"]["random_state"],
 )
 
 model = IsolationForest(
@@ -44,7 +46,7 @@ model = IsolationForest(
     n_estimators=config["model"]["n_estimators"],
     max_samples=config["model"]["max_samples"],
     random_state=config["model"]["random_state"],
-    n_jobs=config["model"]["n_jobs"]
+    n_jobs=config["model"]["n_jobs"],
 )
 
 model.fit(X_train)

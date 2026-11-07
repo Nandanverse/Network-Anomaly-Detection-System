@@ -19,7 +19,7 @@ attack_mapping = config["features"]["attack_mapping"]
 reverse_mapping = {v: k for k, v in attack_mapping.items()}
 threshold = np.percentile(
     -model.score_samples(scaler.transform(np.zeros((1, len(config["features"]["numerical"]))))),
-    config["model"]["threshold_percentile"]
+    config["model"]["threshold_percentile"],
 )
 
 app = FastAPI(title="IDS Anomaly Detection API", version="1.0.0")
@@ -55,19 +55,52 @@ class PredictionResponse(BaseModel):
 
 
 def preprocess_flow(flow: FlowInput) -> np.ndarray:
-    numerical = np.array([[
-        flow.duration, flow.orig_bytes, flow.resp_bytes,
-        flow.orig_pkts, flow.resp_pkts, flow.orig_ip_bytes, flow.resp_ip_bytes
-    ]])
+    numerical = np.array(
+        [
+            [
+                flow.duration,
+                flow.orig_bytes,
+                flow.resp_bytes,
+                flow.orig_pkts,
+                flow.resp_pkts,
+                flow.orig_ip_bytes,
+                flow.resp_ip_bytes,
+            ]
+        ]
+    )
     numerical_scaled = scaler.transform(numerical)
 
-    categorical = np.array([[
-        encoders["proto"].transform([flow.proto])[0] if flow.proto in encoders["proto"].classes_ else 0,
-        encoders["service"].transform([flow.service])[0] if flow.service in encoders["service"].classes_ else 0,
-        encoders["conn_state"].transform([flow.conn_state])[0] if flow.conn_state in encoders["conn_state"].classes_ else 0,
-        encoders["orig_port"].transform([flow.orig_port])[0] if flow.orig_port in encoders["orig_port"].classes_ else 0,
-        encoders["resp_port"].transform([flow.resp_port])[0] if flow.resp_port in encoders["resp_port"].classes_ else 0,
-    ]])
+    categorical = np.array(
+        [
+            [
+                (
+                    encoders["proto"].transform([flow.proto])[0]
+                    if flow.proto in encoders["proto"].classes_
+                    else 0
+                ),
+                (
+                    encoders["service"].transform([flow.service])[0]
+                    if flow.service in encoders["service"].classes_
+                    else 0
+                ),
+                (
+                    encoders["conn_state"].transform([flow.conn_state])[0]
+                    if flow.conn_state in encoders["conn_state"].classes_
+                    else 0
+                ),
+                (
+                    encoders["orig_port"].transform([flow.orig_port])[0]
+                    if flow.orig_port in encoders["orig_port"].classes_
+                    else 0
+                ),
+                (
+                    encoders["resp_port"].transform([flow.resp_port])[0]
+                    if flow.resp_port in encoders["resp_port"].classes_
+                    else 0
+                ),
+            ]
+        ]
+    )
 
     return np.hstack([numerical_scaled, categorical])
 
@@ -86,11 +119,11 @@ async def predict(batch: FlowBatch):
             score = -model.score_samples(x)[0]
             is_anomaly = int(score > threshold)
             predicted = reverse_mapping.get(1, "Unknown") if is_anomaly else "Benign"
-            results.append(Prediction(
-                anomaly_score=float(score),
-                is_anomaly=is_anomaly,
-                predicted_attack=predicted
-            ))
+            results.append(
+                Prediction(
+                    anomaly_score=float(score), is_anomaly=is_anomaly, predicted_attack=predicted
+                )
+            )
         return PredictionResponse(predictions=results)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -102,5 +135,5 @@ async def model_info():
         "type": "isolation_forest",
         "features": feature_names,
         "attack_types": list(attack_mapping.keys()),
-        "threshold": float(threshold)
+        "threshold": float(threshold),
     }
